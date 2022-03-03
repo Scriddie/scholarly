@@ -3,6 +3,8 @@ import re
 from .data_types import Author, AuthorSource, PublicationSource, PublicAccess
 from selenium.webdriver.common.by import By
 import codecs
+import warnings
+
 
 _CITATIONAUTHRE = r'user=([\w-]*)'
 _HOST = 'https://scholar.google.com{0}'
@@ -125,6 +127,17 @@ class AuthorParser:
                  for y in soup.find_all('span', class_='gsc_g_t')]
         cites = [int(c.text)
                  for c in soup.find_all('span', class_='gsc_g_al')]
+        # custom correction for missing years
+        cite_containers = [c['style'].split(';')[0] for c in soup.find_all('a', class_='gsc_g_a')]
+        cite_x = []
+        for i in cite_containers: 
+            cite_x.append(int(''.join([s for s in i if s.isdigit()])))
+        for i in range(len(cite_x) - 1):
+            dist = int((cite_x[i]-cite_x[i+1])/32)
+            if dist > 1:
+                cites.insert(i+1, 0)        
+        if len(cites) != len(years):
+            warnings.warn("Years don't match citations, cite_per_year unreliable.")
         author['cites_per_year'] = dict(zip(years, cites))
 
     def _fill_public_access(self, soup, author):
