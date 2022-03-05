@@ -182,7 +182,7 @@ class AuthorParser:
                 break
 
 
-    def _fill_publications(self, soup, author, publication_limit: int = 0, sortby_str: str = ''):
+    def _fill_publications(self, soup, author, publication_limit: int = 0, sortby_str: str = '', fill_pub=True):
         author['publications'] = list()
         pubstart = 0
         url_citations = _CITATIONAUTH.format(author['scholar_id'])
@@ -193,6 +193,8 @@ class AuthorParser:
         while True:
             for row in soup.find_all('tr', class_='gsc_a_tr'):
                 new_pub = pub_parser.get_publication(row, PublicationSource.AUTHOR_PUBLICATION_ENTRY)
+                if fill_pub:
+                    pub_parser.fill(new_pub)
                 author['publications'].append(new_pub)
                 if (publication_limit) and (len(author['publications']) >= publication_limit):
                     flag = True
