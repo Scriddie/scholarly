@@ -194,7 +194,10 @@ class AuthorParser:
             for row in soup.find_all('tr', class_='gsc_a_tr'):
                 new_pub = pub_parser.get_publication(row, PublicationSource.AUTHOR_PUBLICATION_ENTRY)
                 if fill_pub:
-                    pub_parser.fill_authors(new_pub)
+                    # using first gs_gray tag!
+                    new_pub['bib']['author'] = row.find('div', class_='gs_gray').text
+                    # # this takes too long
+                    # pub_parser.fill_authors(new_pub)
                 author['publications'].append(new_pub)
                 if (publication_limit) and (len(author['publications']) >= publication_limit):
                     flag = True

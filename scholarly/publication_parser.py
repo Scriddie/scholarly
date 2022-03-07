@@ -357,29 +357,29 @@ class PublicationParser(object):
         return publication
 
 
-    def fill_authors(self, publication: Publication)->Publication:
-        """Populate the Publication with information from its profile
+    # def fill_authors(self, publication: Publication)->Publication:
+    #     """Populate the Publication with information from its profile
 
-        :param publication: Scholar or Citation publication container object that is not filled
-        :type publication: PublicationCitation or PublicationScholar
-        """
-        if publication['source'] == PublicationSource.AUTHOR_PUBLICATION_ENTRY:
-            url = _CITATIONPUB.format(publication['author_pub_id'])
-            soup = self.nav._get_soup(url)
-            for item in soup.find_all('div', class_='gs_scl'):
-                key = item.find(class_='gsc_oci_field').text.strip().lower()
-                val = item.find(class_='gsc_oci_value')
-                if key == 'authors' or key == 'inventors':
-                    publication['bib']['author'] = ' and '.join(
-                        [i.strip() for i in val.text.split(',')])
-            publication['filled'] = True
-        elif publication['source'] == PublicationSource.PUBLICATION_SEARCH_SNIPPET:
-            bibtex_url = self._get_bibtex(publication['url_scholarbib'])
-            bibtex = self.nav._get_page(bibtex_url)
-            parser = bibtexparser.bparser.BibTexParser(common_strings=True)
-            parsed_bib = remap_bib(bibtexparser.loads(bibtex,parser).entries[-1], _BIB_MAPPING, _BIB_DATATYPES)
-            publication['bib'].update(parsed_bib)
-        return publication
+    #     :param publication: Scholar or Citation publication container object that is not filled
+    #     :type publication: PublicationCitation or PublicationScholar
+    #     """
+    #     if publication['source'] == PublicationSource.AUTHOR_PUBLICATION_ENTRY:
+    #         url = _CITATIONPUB.format(publication['author_pub_id'])
+    #         soup = self.nav._get_soup(url)
+    #         for item in soup.find_all('div', class_='gs_scl'):
+    #             key = item.find(class_='gsc_oci_field').text.strip().lower()
+    #             val = item.find(class_='gsc_oci_value')
+    #             if key == 'authors' or key == 'inventors':
+    #                 publication['bib']['author'] = ' and '.join(
+    #                     [i.strip() for i in val.text.split(',')])
+    #         publication['filled'] = True
+    #     elif publication['source'] == PublicationSource.PUBLICATION_SEARCH_SNIPPET:
+    #         bibtex_url = self._get_bibtex(publication['url_scholarbib'])
+    #         bibtex = self.nav._get_page(bibtex_url)
+    #         parser = bibtexparser.bparser.BibTexParser(common_strings=True)
+    #         parsed_bib = remap_bib(bibtexparser.loads(bibtex,parser).entries[-1], _BIB_MAPPING, _BIB_DATATYPES)
+    #         publication['bib'].update(parsed_bib)
+    #     return publication
 
 
     def citedby(self, publication: Publication) -> _SearchScholarIterator or list:
